@@ -1,0 +1,10 @@
+# Standard ignores
+node_modules/
+.env
+.DS_Store
+dist/
+*.log
+
+# Docker ignores
+docker-compose.override.yml
+.vscode/
