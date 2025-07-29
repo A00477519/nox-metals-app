@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../stores/authStore';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,

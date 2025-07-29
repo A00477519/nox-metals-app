@@ -1,7 +1,7 @@
 // src/components/layout/PrivateRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
-import LoadingScreen from '../LoadingScreen';
+import { useAuthStore } from '../../stores/authStore';
+import LoadingScreen from '../common/LoadingScreen';
 
 interface PrivateRouteProps {
   /**

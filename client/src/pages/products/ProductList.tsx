@@ -2,8 +2,8 @@
 import { useQuery } from 'react-query';
 import { getProducts } from '../../api/products';
 import ProductCard from './ProductCard';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorAlert from '../../components/ErrorAlert';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorAlert from '../../components/common/ErrorAlert';
 import Pagination from '../../components/Pagination';
 import { useState } from 'react';
 
@@ -27,7 +27,20 @@ const ProductList = () => {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.data.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={{
+              ...product,
+              createdAt: typeof product.createdAt === 'string'
+                ? product.createdAt
+                : product.createdAt.toISOString(),
+              updatedAt: product.updatedAt
+                ? (typeof product.updatedAt === 'string'
+                    ? product.updatedAt
+                    : product.updatedAt.toISOString())
+                : undefined,
+            }}
+          />
         ))}
       </div>
 

@@ -1,6 +1,6 @@
 // src/components/AuthInitializer.tsx
 import { useEffect } from 'react';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../stores/authStore';
 
 const AuthInitializer = () => {
   const initialize = useAuthStore((state) => state.initialize);

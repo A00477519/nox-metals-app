@@ -1,9 +1,10 @@
 // src/api/auth.ts
 import axios from 'axios';
-import config from '../config/env';
+// import config from '../config/env';
+
 
 const api = axios.create({
-  baseURL: config.apiBaseUrl,
+  baseURL: process.env.REACT_APP_API_URL,
 });
 
 export default {

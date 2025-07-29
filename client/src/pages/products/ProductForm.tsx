@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { createProduct, uploadProductImage } from '../../api/products';
 import { useForm } from 'react-hook-form';
 import { ProductFormValues } from './types';
-import ErrorAlert from '../../components/ErrorAlert';
+import ErrorAlert from '../../components/common/ErrorAlert';
 import LoadingButton from '../../components/LoadingButton';
 
 const ProductForm = () => {

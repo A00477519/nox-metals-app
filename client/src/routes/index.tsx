@@ -1,17 +1,19 @@
 // src/routes.tsx
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import PrivateRoute from './components/layout/PrivateRoute';
-import LoadingScreen from './components/LoadingScreen';
-import Layout from './components/layout/Layout';
-import Unauthorized from './components/Unauthorized';
+import PrivateRoute from '../components/layout/PrivateRoute';
+import LoadingScreen from '../components/common/LoadingScreen';
+import Layout from '../components/layout/Layout';
+import Unauthorized from '../components/Unauthorized';
+
 
 // Lazy load pages
-const Home = lazy(() => import('./pages/Home'));
-const Login = lazy(() => import('./pages/Login'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const UserProfile = lazy(() => import('./pages/UserProfile'));
-const Products = lazy(() => import('./pages/Products'));
+const Home = lazy(() => import('../pages/home/Home'));
+const Login = lazy(() => import('../pages/auth/Login'));
+const UserDashboard = lazy(() => import('../pages/dashboard/Dashboard'));
+const UserProfile = lazy(() => import('../pages/user/Profile'));
+const Products = lazy(() => import('../pages/products/ProductsPage'));
+const Admin = lazy(() => import('../pages/dashboard/Admin'));
 
 const AppRoutes = () => {
   return (
@@ -28,12 +30,12 @@ const AppRoutes = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/dashboard/user" element={<UserDashboard />} />
         </Route>
 
         {/* Admin-only routes */}
         <Route element={<PrivateRoute roles={['admin']} />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/dashboard/Admin" element={<Admin />} />
         </Route>
       </Routes>
     </Suspense>

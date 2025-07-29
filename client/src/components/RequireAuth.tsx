@@ -1,10 +1,11 @@
 // src/components/RequireAuth.tsx
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import LoadingScreen from './LoadingScreen';
+import { useAuthStore } from '../stores/authStore';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 interface RequireAuthProps {
-  children: JSX.Element;
+  children: React.ReactNode;
   allowedRoles?: ('admin' | 'user')[];
 }
 

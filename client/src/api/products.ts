@@ -1,6 +1,6 @@
 // src/api/products.ts
 import axios from 'axios';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../stores/authStore';
 
 // Define types for your product data
 interface Product {
