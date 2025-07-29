@@ -11,14 +11,24 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  # app:
+  #   build: .
+  #   environment:
+  #     - MONGO_URI=mongodb://admin:password@mongo:27017/nox-metals?authSource=admin
+  #   # ports:
+  #   #   - "5000:5000"
+  #   depends_on:
+  #     - mongo
+
   app:
     build: .
-    environment:
-      - MONGO_URI=mongodb://admin:password@mongo:27017/nox-metals?authSource=admin
     ports:
-      - "3000:3000"
+      - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - mongo
+    restart: always
 
 volumes:
   mongo_data:

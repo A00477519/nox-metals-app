@@ -8,3 +8,5 @@ dist/
 # Docker ignores
 docker-compose.override.yml
 .vscode/
+
+.env.*
