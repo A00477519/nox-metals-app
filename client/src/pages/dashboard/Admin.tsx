@@ -45,6 +45,7 @@ import { getProducts, createProduct, deleteProduct } from '../../api/products';
 
 interface Product {
   id: string;
+  _id?: string; // Allow _id for backend compatibility
   name: string;
   description: string;
   price: number;
@@ -88,6 +89,27 @@ const Admin = () => {
     },
     onError: (error) => {
       setError('Failed to create product');
+    }
+  });
+
+  // Update product mutation
+  const updateMutation = useMutation(
+    (product: Product) => {
+      if (selectedProduct) {
+        // Remove 'id' from the payload to match the expected type
+        const { id, ...productData } = product;
+        return createProduct(productData);
+      }
+      return createProduct(product);
+    }
+  , {
+    onSuccess: () => {
+      queryClient.invalidateQueries('admin-products');
+      setOpenDialog(false);
+      resetForm();
+    },
+    onError: (error) => {
+      setError('Failed to update product');
     }
   });
 
@@ -150,9 +172,15 @@ const Admin = () => {
       setError('Please fill in all required fields');
       return;
     }
+    // console.log(selectedProduct._id);
+    if (selectedProduct && selectedProduct._id) {
+      updateMutation.mutate({ ...productForm, id: selectedProduct._id });
+    } else {
+      createMutation.mutate(productForm);
+    }
 
-    createMutation.mutate(productForm);
   };
+  
 
   const handleCloseDialog = () => {
     setOpenDialog(false);

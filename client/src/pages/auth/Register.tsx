@@ -46,6 +46,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+//   console.log(formData.role)
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -56,7 +57,8 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    console.log(formData.role);
+
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');

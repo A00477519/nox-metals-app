@@ -32,6 +32,8 @@ export default {
 }) {
     try {
       const response = await api.post('/auth/register', userData);
+      console.log(userData.role);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       throw error;

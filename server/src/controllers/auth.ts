@@ -5,9 +5,11 @@ import User from '../models/User';
 import config from '../config/env';
 import { NotFoundError, UnauthorizedError, ValidationError } from '../utils/error';
 
+
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    // Accept role and other fields from request body
+    const { email, password, role, ...rest } = req.body;
 
     if (!email || !password) {
       throw new ValidationError('Email and password are required');
@@ -18,7 +20,14 @@ export const register = async (req: Request, res: Response) => {
       throw new UnauthorizedError('Email already in use');
     }
 
-    const user = await User.create({ email, password });
+    // Normalize and validate role
+    let safeRole = 'user';
+    if (typeof role === 'string' && ['admin', 'user'].includes(role.toLowerCase())) {
+      safeRole = role.toLowerCase();
+    }
+
+    // Pass all fields including validated role
+    const user = await User.create({ email, password, role: safeRole, ...rest });
     const token = generateToken(user);
 
     res.status(201).json({
