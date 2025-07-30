@@ -4,6 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { useAuthStore } from '../../stores/authStore';
 import api from '../../api/auth';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
+
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,17 +15,42 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuthStore();
+  const { login,  setUser } = useAuthStore();
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/dashboard/user';
+    const registrationData = location.state?.userData;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+    const role= registrationData?.role === 'user'? '/dashboard/user' : '/dashboard/admin';
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await api.login(email, password);
-      login(response.token);
-      navigate(from, { replace: true });
+       // If we have registration data, use it
+      if (registrationData) {
+        if (registrationData.role === 'user') {
+          setUser({
+            email: registrationData.email,
+            firstName: registrationData.firstName,
+            role: 'user'
+          });
+        } else if (registrationData.role === 'admin'
+        ){
+          setUser({
+            email: registrationData.email,
+            firstName: registrationData.firstName,
+            role: 'admin'
+          });
+        }
+      }
+      // console.log(response)
+      console.log(response.data.data.token);
+      login(response.data.data.token);
+      // navigate(from, { replace: true });
+      navigate(role, { replace: true });
     } catch (err) {
+      console.error('Login failed:', err);
+      console.log(err);
       setError('Invalid credentials');
     }
   };
@@ -53,6 +82,14 @@ const Login = () => {
           Sign In
         </Button>
       </form>
+      <Box sx={{ mt: 2, textAlign: 'center' }}>
+      <Typography variant="body2">
+        Don&apos;t have an account?{' '}
+        <Link component={RouterLink} to="/register">
+          Register
+        </Link>
+      </Typography>
+    </Box>
     </Box>
   );
 };

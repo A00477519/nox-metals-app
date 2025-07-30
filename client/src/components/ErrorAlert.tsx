@@ -13,3 +13,4 @@ const ErrorAlert = ({ message = 'An error occurred', ...props }: ErrorAlertProps
 };
 
 export default ErrorAlert;
+

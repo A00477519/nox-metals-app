@@ -33,8 +33,10 @@ const PrivateRoute = ({
 
   // Not authenticated
   if (!token) {
+    console.log({token});
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
+
 
   // Check roles if specified
   if (roles && !roles.includes(user?.role as 'admin' | 'user')) {

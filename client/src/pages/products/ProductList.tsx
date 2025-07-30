@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { getProducts } from '../../api/products';
 import ProductCard from './ProductCard';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorAlert from '../../components/common/ErrorAlert';
+import ErrorAlert from '../../components/ErrorAlert';
 import Pagination from '../../components/Pagination';
 import { useState } from 'react';
 

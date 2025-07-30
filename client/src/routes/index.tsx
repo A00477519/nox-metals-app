@@ -10,9 +10,10 @@ import Unauthorized from '../components/Unauthorized';
 // Lazy load pages
 const Home = lazy(() => import('../pages/home/Home'));
 const Login = lazy(() => import('../pages/auth/Login'));
+const Register = lazy(() => import('../pages/auth/Register'));
 const UserDashboard = lazy(() => import('../pages/dashboard/Dashboard'));
 const UserProfile = lazy(() => import('../pages/user/Profile'));
-const Products = lazy(() => import('../pages/products/ProductsPage'));
+const Products = lazy(() => import('../pages/products/ProductList'));
 const Admin = lazy(() => import('../pages/dashboard/Admin'));
 
 const AppRoutes = () => {
@@ -23,6 +24,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="unauthorized" element={<Unauthorized />} />
         </Route>
 
@@ -36,6 +38,7 @@ const AppRoutes = () => {
         {/* Admin-only routes */}
         <Route element={<PrivateRoute roles={['admin']} />}>
           <Route path="/dashboard/Admin" element={<Admin />} />
+          
         </Route>
       </Routes>
     </Suspense>
