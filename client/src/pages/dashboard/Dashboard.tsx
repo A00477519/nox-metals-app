@@ -1,4 +1,3 @@
-
 // const Dashboard = () => {
 //   return (
 //     <div>
@@ -32,7 +31,11 @@ import {
   Alert,
   TextField,
   InputAdornment,
-  Pagination
+  Pagination,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import {
   Person,
@@ -61,6 +64,8 @@ const Dashboard = () => {
   const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [sort, setSort] = useState('createdAt:desc');
+  const [stockFilter, setStockFilter] = useState('');
   const limit = 9;
 
   const navigate = useNavigate();
@@ -76,25 +81,62 @@ const Dashboard = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
   // Fetch products
-  const {
-    data: productsData,
-    isLoading,
-    isError,
-    error
-  } = useQuery(
-    ['products', { page, limit, search: searchTerm, category: selectedCategory }],
-    () => getProducts({ 
-      page, 
-      limit, 
-      search: debouncedSearchTerm || undefined, // Only pass search if not empty
-      category: selectedCategory || undefined,
-      sort: 'createdAt:desc' 
-    }),
-    {
-      keepPreviousData: true,
-      enabled: true // Always enabled
-    }
-  );
+//   const {
+//     data: productsData,
+//     isLoading,
+//     isError,
+//     error
+//   } = useQuery(
+//     ['products', { page, limit, search: searchTerm, category: selectedCategory, stock: stockFilter, sort  }],
+//     () => getProducts({ 
+//       page, 
+//       limit, 
+//       search: debouncedSearchTerm || undefined, // Only pass search if not empty
+//       category: selectedCategory || undefined,
+//       stock: stockFilter ? Number(stockFilter) : undefined,
+//       sort: sort
+//     }),
+//     {
+//       keepPreviousData: true,
+//       enabled: true // Always enabled
+//     }
+//   );
+
+    // Fix the useQuery section (around lines 70-85):
+const {
+  data: productsData,
+  isLoading,
+  isError,
+  error
+} = useQuery(
+  // Fix 1: Update query key to include ALL filter states
+  ['products', { 
+    page, 
+    limit, 
+    search: debouncedSearchTerm,  // Use debounced, not searchTerm
+    category: selectedCategory,
+    sort: sort,                   // Add sort to query key
+    stock: stockFilter           // Add stock to query key
+  }],
+  // Fix 2: Pass dynamic sort instead of hard-coded
+  () => getProducts({ 
+    page, 
+    limit, 
+    search: debouncedSearchTerm || undefined,
+    category: selectedCategory || undefined,
+    stock: stockFilter ? Number(stockFilter) : undefined,
+    sort: sort  // Use dynamic sort, not 'createdAt:desc'
+  }),
+  {
+    keepPreviousData: true,
+    enabled: true
+  }
+);
+
+// Fix 3: Add useEffect to reset page when filters change
+useEffect(() => {
+  setPage(1);
+}, [selectedCategory, stockFilter, sort]);
 
   const products = productsData?.data || [];
   const totalPages = Math.ceil((productsData?.total || 0) / limit);
@@ -124,6 +166,28 @@ const Dashboard = () => {
   };
 
   if (isLoading) return <LoadingSpinner />;
+
+  // Add debug logging here - around line 142
+  console.log('Dashboard filter values:', {
+    searchTerm,
+    debouncedSearchTerm,
+    selectedCategory,
+    stockFilter,
+    sort,
+    page
+  });
+
+  console.log('API call parameters:', {
+    page, 
+    limit, 
+    search: debouncedSearchTerm || undefined,
+    category: selectedCategory || undefined,
+    stock: stockFilter ? Number(stockFilter) : undefined,
+    sort: sort
+  });
+
+  console.log('Products response:', productsData);
+
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -174,7 +238,6 @@ const Dashboard = () => {
           <Typography variant="h5">
             Available Products
           </Typography>
-          
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search products..."
@@ -201,7 +264,46 @@ const Dashboard = () => {
               }}
               sx={{ minWidth: 250 }}
             />
-            
+            {/* Category Filter */}
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                label="Category"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Steel">Steel</MenuItem>
+                <MenuItem value="Aluminum">Aluminum</MenuItem>
+                </Select>
+                </FormControl>
+                {/* Stock Filter */}
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Stock</InputLabel>
+                <Select
+                value={stockFilter}
+                label="Stock"
+                onChange={(e) => setStockFilter(e.target.value)}
+                >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="0">Out of Stock</MenuItem>
+                <MenuItem value="1">In Stock</MenuItem>
+                </Select>
+                </FormControl>
+                {/* Sort Filter */}
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Sort By</InputLabel>
+                <Select
+                value={sort}
+                label="Sort By"
+                onChange={(e) => setSort(e.target.value)}
+                >
+                <MenuItem value="createdAt:desc">Newest</MenuItem>
+                <MenuItem value="price:asc">Price: Low to High</MenuItem>
+                <MenuItem value="price:desc">Price: High to Low</MenuItem>
+                {/* Add more sort options as needed */}
+                </Select>
+                </FormControl>
             <Button
               variant="outlined"
               startIcon={<FilterList />}
@@ -237,7 +339,6 @@ const Dashboard = () => {
               <Card 
                 sx={{ 
                   height: '100%',
-                //   width: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   transition: 'transform 0.2s',
@@ -248,39 +349,20 @@ const Dashboard = () => {
                 }}
               >
                 <CardMedia
-                  component="div"
+                  component="img"
                   sx={{
                     height: 200,
                     objectFit: 'cover',
-                    // width: '80%',
                     bgcolor: 'grey.200',
-                    backgroundImage: product.imageUrl ? `url(${product.imageUrl})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
-                >
-                  {/* {!product.imageUrl && (
-                    <Typography variant="body2" color="text.secondary">
-                      No Image Available
-                    </Typography>
-                  )} */}
-                  {(!product.imageUrl || product.imageUrl === '') && (
-                        <Box sx={{ textAlign: 'center', p: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            No Image Available
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            {product.name}
-                        </Typography>
-                        </Box>
-                    )}
-                </CardMedia>
+                  image={product.imageUrl && product.imageUrl !== '' ? product.imageUrl : undefined}
+                  alt={product.name}
+                />
 
-        
-                
+
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" gutterBottom>
                     {product.name}
@@ -342,13 +424,21 @@ const Dashboard = () => {
               }
             </Typography>
             {debouncedSearchTerm && (
-              <Button 
-                variant="outlined" 
-                onClick={handleClearSearch}
-                sx={{ mt: 2 }}
-              >
-                Clear Search
-              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<FilterList />}
+                onClick={() => {
+                    // Clear all filters
+                    setSearchTerm('');
+                    setDebouncedSearchTerm('');
+                    setSelectedCategory('');
+                    setStockFilter('');
+                    setSort('createdAt:desc');
+                    setPage(1);
+                }}
+                >
+                Clear Filters
+                </Button>
             )}
           </Box>
         )}

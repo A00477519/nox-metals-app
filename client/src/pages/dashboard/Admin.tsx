@@ -34,7 +34,11 @@ import {
   Alert,
   Chip,
   IconButton,
-  Fab
+  Fab,
+  FormControl,  
+  InputLabel,   
+  Select,       
+  MenuItem 
 } from '@mui/material';
 import {
   Add,
@@ -376,7 +380,7 @@ const Admin = () => {
                 onChange={(e) => handleInputChange('stock', parseInt(e.target.value))}
               />
             </Grid>
-            <Grid item xs={12} {...({} as any)}>
+            {/* <Grid item xs={12} {...({} as any)}>
               <TextField
                 label="Category"
                 fullWidth
@@ -384,8 +388,22 @@ const Admin = () => {
                 value={productForm.category}
                 onChange={(e) => handleInputChange('category', e.target.value)}
               />
-            </Grid>
-            <Grid item xs={12} {...({} as any)}>
+            </Grid> */}
+            <Grid item xs={12} sm={6} {...({} as any)} width={'36%'}>
+            <FormControl fullWidth required>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={productForm.category}
+                label="Category"
+                onChange={(e) => handleInputChange('category', e.target.value)}
+              >
+                <MenuItem value="">Select Category</MenuItem>
+                <MenuItem value="Steel">Steel</MenuItem>
+                <MenuItem value="Aluminum">Aluminum</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+            <Grid item xs={12} sm={6} {...({} as any)}>
               <TextField
                 label="Image URL"
                 fullWidth

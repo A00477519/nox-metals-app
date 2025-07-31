@@ -145,3 +145,4 @@ export const uploadProductImage = async (id: string, imageFile: File): Promise<s
   throw error as ApiError;
   }
 };
+
