@@ -46,25 +46,9 @@ const Home = () => {
             <Typography variant="h5" sx={{ mb: 4 }}>
               Your trusted partner in premium metal solutions
             </Typography>
-            <Button
-              component={RouterLink}
-              to="/products"
-              variant="contained"
-              color="secondary"
-              size="large"
-              sx={{ mr: 2 }}
-            >
-              View Products
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/contact"
-              variant="outlined"
-              color="inherit"
-              size="large"
-            >
-              Contact Us
-            </Button>
+            
+            
+            
           </Box>
         </Container>
       </Box>
@@ -113,8 +97,37 @@ const Home = () => {
               </Typography>
             </Paper>
           </Grid>
-          
+
+           
         </Grid>
+
+        {/* Call to Action Section */}
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h4" gutterBottom>
+            Ready to Get Started?
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            Join thousands of satisfied customers and access our premium metal solutions today.
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              component={RouterLink}
+              to="/register"
+              variant="contained"
+              size="large"
+            >
+              Create Account
+            </Button>
+            <Button
+              component={RouterLink}
+              to="/login"
+              variant="outlined"
+              size="large"
+            >
+              Sign In
+            </Button>
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

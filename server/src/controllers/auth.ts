@@ -39,6 +39,28 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+// Add this new function to get user count
+export const getUserCount = async (req: Request, res: Response) => {
+  try {
+    const count = await User.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error('Error getting user count:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Add this function to get all users (for admin)
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find().select('-password'); // Exclude passwords
+    res.json({ data: users, total: users.length });
+  } catch (error) {
+    console.error('Error getting users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;

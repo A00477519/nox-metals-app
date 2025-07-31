@@ -9,8 +9,12 @@
 // export default Admin;
 
 // src/pages/user/Admin.tsx
-
+import { useNavigate } from 'react-router-dom';
+import { Logout } from '@mui/icons-material';
+import { useAuthStore } from '../../stores/authStore';
 import { useState } from 'react';
+import { getUserCount } from '../../api/auth'; // Add this import
+
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
   Box,
@@ -41,7 +45,7 @@ import {
   People,
   Analytics
 } from '@mui/icons-material';
-import { getProducts, createProduct, deleteProduct } from '../../api/products';
+import { getProducts, createProduct, deleteProduct, updateProduct } from '../../api/products';
 
 interface Product {
   id: string;
@@ -68,6 +72,8 @@ const Admin = () => {
   const [error, setError] = useState('');
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { logout, user } = useAuthStore();
 
   // Fetch products
   const { data: products, isLoading } = useQuery(
@@ -79,6 +85,13 @@ const Admin = () => {
       }
     }
   );
+
+  const handleSignOut = () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      logout();
+      navigate('/login');
+    }
+  };
 
   // Create product mutation
   const createMutation = useMutation(createProduct, {
@@ -98,9 +111,10 @@ const Admin = () => {
       if (selectedProduct) {
         // Remove 'id' from the payload to match the expected type
         const { id, ...productData } = product;
-        return createProduct(productData);
+        return updateProduct(id, productData);
       }
-      return createProduct(product);
+      // Optionally, throw an error or return a rejected promise if selectedProduct is not set
+      return Promise.reject(new Error('No product selected for update'));
     }
   , {
     onSuccess: () => {
@@ -180,20 +194,31 @@ const Admin = () => {
     }
 
   };
-  
+
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     resetForm();
   };
 
+  const { data: userCountData } = useQuery(
+    'user-count',
+    getUserCount,
+    {
+      onError: (error) => {
+        console.error('Failed to fetch user count:', error);
+      }
+    }
+  );
+
   // Mock stats data
   const stats = [
     { title: 'Total Products', value: products?.total || 0, icon: <Inventory />, color: 'primary' },
-    { title: 'Total Users', value: 156, icon: <People />, color: 'success' },
-    { title: 'Revenue', value: '$45,230', icon: <Analytics />, color: 'warning' },
-    { title: 'Orders', value: 89, icon: <Dashboard />, color: 'info' }
+    { title: 'Total Users', value: userCountData?.count || 0, icon: <People />, color: 'success' }, // Updated this line
+    // { title: 'Revenue', value: '$45,230', icon: <Analytics />, color: 'warning' },
+    // { title: 'Orders', value: 89, icon: <Dashboard />, color: 'info' }
   ];
+
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -205,6 +230,22 @@ const Admin = () => {
           Manage your Nox Metals inventory and business operations
         </Typography>
       </Box>
+
+      <Button
+          variant="outlined"
+          color="error"
+          startIcon={<Logout />}
+          onClick={handleSignOut}
+          sx={{ 
+            height: 'fit-content',
+            '&:hover': {
+              backgroundColor: 'error.light',
+              color: 'white'
+            }
+          }}
+        >
+          Sign Out
+        </Button>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
@@ -254,7 +295,7 @@ const Admin = () => {
 
         <Grid container spacing={3}>
           {products?.data?.map((product: Product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.id} {...({} as any)} >
+            <Grid item xs={12} sm={6} md={4} key={product.id} width={'45%'} {...({} as any)} >
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>

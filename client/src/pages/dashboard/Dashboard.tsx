@@ -10,6 +10,9 @@
 // export default Dashboard;
 
 // src/pages/dashboard/Dashboard.tsx
+import { useNavigate } from 'react-router-dom';
+import { Logout } from '@mui/icons-material';
+
 
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
@@ -53,12 +56,25 @@ interface Product {
 }
 
 const Dashboard = () => {
-  const { user } = useAuthStore();
+  const {logout, user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const limit = 9;
 
+  const navigate = useNavigate();
+//   const { logout, user } = useAuthStore();
+
+    // Debounce search term to avoid too many API calls
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setPage(1); // Reset to first page when searching
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
   // Fetch products
   const {
     data: productsData,
@@ -70,17 +86,25 @@ const Dashboard = () => {
     () => getProducts({ 
       page, 
       limit, 
-      search: searchTerm,
-      category: selectedCategory,
+      search: debouncedSearchTerm || undefined, // Only pass search if not empty
+      category: selectedCategory || undefined,
       sort: 'createdAt:desc' 
     }),
     {
-      keepPreviousData: true
+      keepPreviousData: true,
+      enabled: true // Always enabled
     }
   );
 
   const products = productsData?.data || [];
   const totalPages = Math.ceil((productsData?.total || 0) / limit);
+
+  // Clear search function
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setDebouncedSearchTerm('');
+    setPage(1);
+  };
 
   const handleAddToCart = (productId: string) => {
     // Implement add to cart functionality
@@ -90,6 +114,13 @@ const Dashboard = () => {
   const handleAddToFavorites = (productId: string) => {
     // Implement add to favorites functionality
     console.log('Added to favorites:', productId);
+  };
+
+  const handleSignOut = () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      logout();
+      navigate('/login');
+    }
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -112,14 +143,30 @@ const Dashboard = () => {
           </Avatar>
           <Box>
             <Typography variant="h5">
-              Welcome back, {user?.firstName || 'User'}!
+              Welcome back, {user?.firstName || JSON.parse(localStorage.getItem('pendingUserData') || '{}').firstName || 'User'}!
             </Typography>
             <Typography variant="body1" color="text.secondary">
               {user?.email}
             </Typography>
-          </Box>
-        </Box>
-      </Paper>
+
+            <Button
+                variant="outlined"
+                color="error"
+                startIcon={<Logout />}
+                onClick={handleSignOut}
+                sx={{ 
+                    height: 'fit-content',
+                    '&:hover': {
+                      backgroundColor: 'error.light',
+                      color: 'white'
+                    }
+                  }}
+                >
+                  Sign Out
+                </Button>
+              </Box>
+            </Box>
+          </Paper>
 
       {/* Products Section */}
       <Paper elevation={3} sx={{ p: 3 }}>
@@ -127,6 +174,7 @@ const Dashboard = () => {
           <Typography variant="h5">
             Available Products
           </Typography>
+          
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search products..."
@@ -139,9 +187,21 @@ const Dashboard = () => {
                     <Search />
                   </InputAdornment>
                 ),
+                 endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <Button
+                      size="small"
+                      onClick={handleClearSearch}
+                      sx={{ minWidth: 'auto', p: 0.5 }}
+                    >
+                      ×
+                    </Button>
+                  </InputAdornment>
+                ),
               }}
               sx={{ minWidth: 250 }}
             />
+            
             <Button
               variant="outlined"
               startIcon={<FilterList />}
@@ -152,6 +212,18 @@ const Dashboard = () => {
           </Box>
         </Box>
 
+        {/* Search Results Info */}
+        {debouncedSearchTerm && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {isLoading 
+                ? 'Searching...' 
+                : `Found ${productsData?.total || 0} results for "${debouncedSearchTerm}"`
+              }
+            </Typography>
+          </Box>
+        )}
+
         {isError && (
           <Alert severity="error" sx={{ mb: 3 }}>
             Error loading products: {(error as Error)?.message}
@@ -161,10 +233,11 @@ const Dashboard = () => {
         {/* Products Grid */}
         <Grid container spacing={3}>
           {products.map((product: Product) => (
-            <Grid xs={12} sm={6} md={4} key={product.id} {...({} as any)}>
+            <Grid xs={12} sm={6} md={4} width='40%' key={product.id} {...({} as any)}>
               <Card 
                 sx={{ 
                   height: '100%',
+                //   width: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   transition: 'transform 0.2s',
@@ -178,6 +251,8 @@ const Dashboard = () => {
                   component="div"
                   sx={{
                     height: 200,
+                    objectFit: 'cover',
+                    // width: '80%',
                     bgcolor: 'grey.200',
                     backgroundImage: product.imageUrl ? `url(${product.imageUrl})` : 'none',
                     backgroundSize: 'cover',
@@ -187,12 +262,24 @@ const Dashboard = () => {
                     justifyContent: 'center'
                   }}
                 >
-                  {!product.imageUrl && (
+                  {/* {!product.imageUrl && (
                     <Typography variant="body2" color="text.secondary">
                       No Image Available
                     </Typography>
-                  )}
+                  )} */}
+                  {(!product.imageUrl || product.imageUrl === '') && (
+                        <Box sx={{ textAlign: 'center', p: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            No Image Available
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            {product.name}
+                        </Typography>
+                        </Box>
+                    )}
                 </CardMedia>
+
+        
                 
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" gutterBottom>
@@ -218,7 +305,7 @@ const Dashboard = () => {
                   )}
                 </CardContent>
                 
-                <CardActions sx={{ p: 2 }}>
+                {/* <CardActions sx={{ p: 2 }}>
                   <Button
                     size="small"
                     variant="contained"
@@ -236,12 +323,37 @@ const Dashboard = () => {
                   >
                     <Favorite />
                   </Button>
-                </CardActions>
+                </CardActions> */}
               </Card>
             </Grid>
           ))}
         </Grid>
 
+          {/* No Results Message */}
+        {products.length === 0 && !isLoading && (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="h6" color="text.secondary">
+              {debouncedSearchTerm ? 'No products found' : 'No products available'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {debouncedSearchTerm 
+                ? `Try different keywords or clear your search` 
+                : 'Check back later for new products'
+              }
+            </Typography>
+            {debouncedSearchTerm && (
+              <Button 
+                variant="outlined" 
+                onClick={handleClearSearch}
+                sx={{ mt: 2 }}
+              >
+                Clear Search
+              </Button>
+            )}
+          </Box>
+        )}
+
+        
         {/* Pagination */}
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>

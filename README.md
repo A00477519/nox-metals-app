@@ -70,6 +70,20 @@ cd client
 npm start
 The app should be running at http://localhost:3000
 
+## Test Credentials
+
+To test the application, you can use these pre-configured accounts:
+
+### Regular User Account
+- **Email:** client2@example.com
+- **Password:** Password123
+
+### Admin Account
+- **Email:** admin1@example.com
+- **Password:** Password123
+
+The admin account has additional privileges for managing products and viewing user statistics in the admin dashboard.
+
 # Testing
 
 Manual testing for authentication and product features
