@@ -13,8 +13,13 @@ const app = express();
 //     credentials: true
 //   }));
 
-  app.use(cors({
-  origin: config.corsOrigin,
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://nox-metals-frontend-40gue47jc.vercel.app',
+    'https://nox-metals-frontend.vercel.app',
+    'https://nox-metals-frontend-*.vercel.app' // Allow any Vercel preview deployments
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -29,6 +34,16 @@ app.use(helmet({
 }));
 app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
 app.use(express.json());
+
+// Add the root route HERE (after middleware, before other routes)
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Nox Metals API is running! 🚀',
+    status: 'success',
+    timestamp: new Date().toISOString(),
+    environment: config.nodeEnv || 'development'
+  });
+});
 
 // Routes
 app.use('/api', routes);

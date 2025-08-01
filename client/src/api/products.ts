@@ -28,7 +28,9 @@ interface ApiError {
   code?: string;
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_URL = 'https://nox-metals-api-d136b5c0f2a1.herokuapp.com/api';
+
 
 // Create axios instance with base config
 const api = axios.create({
