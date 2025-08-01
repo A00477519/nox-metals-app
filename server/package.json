@@ -6,9 +6,14 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "heroku-postbuild": "npm install typescript && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:watch": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts",
     "clean": "rm -rf dist/*"
+  },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
   },
   "keywords": [],
   "author": "",
@@ -38,7 +43,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "resolutions": {
     "nth-check": "2.0.1",
