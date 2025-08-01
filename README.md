@@ -4,7 +4,7 @@
 This project is a full-stack application built with React, TypeScript, and Express. It demonstrates user authentication and product management functionalities, highlighting skills in frontend and backend development, secure data handling, and clean architectural design.
 
 ## 🚀 Live Demo
-- **Frontend:** https://nox-metals-frontend-40gue47jc.vercel.app
+- **Frontend:** https://nox-metals-frontend-rfbrj8c01.vercel.app
 - **Backend API:** https://nox-metals-api-d136b5c0f2a1.herokuapp.com
 
 

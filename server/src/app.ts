@@ -16,6 +16,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'https://nox-metals-frontend-rfbrj8c01.vercel.app',
     'https://nox-metals-frontend-40gue47jc.vercel.app',
     'https://nox-metals-frontend.vercel.app',
     'https://nox-metals-frontend-*.vercel.app' // Allow any Vercel preview deployments
