@@ -4,7 +4,9 @@ import axios from 'axios';
 
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  // baseURL: process.env.REACT_APP_API_URL,
+  baseURL: 'https://nox-metals-api-d136b5c0f2a1.herokuapp.com/api',
+
 });
 
 export default {

@@ -57,7 +57,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData.role);
+    // console.log(formData.role);
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
@@ -72,6 +72,10 @@ const Register = () => {
 
     setLoading(true);
     try {
+    console.log('Making API call to register...');
+    // console.log('API Base URL:', import.meta.env.VITE_API_URL);
+    
+            // console.log('Making API call to register...');
     const response = await api.register(
       formData.email,
       formData.password,
@@ -106,6 +110,8 @@ const Register = () => {
           }
         }
       });
+          console.log('Registration response:', response);
+
     } catch (err: any) {
       console.error('Registration failed:', err);
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
